@@ -65,4 +65,23 @@ public class AuthController {
 					return ResponseEntity.badRequest().body(response);
 				});
 	}
+
+	@PostMapping("/validate")
+	public ResponseEntity<Object> validateToken(@RequestHeader("Authorization") String token) {
+		if (token != null && token.startsWith("Bearer ")) {
+			token = token.substring(7);
+		}
+
+		boolean isValid = jwtUtil.validateToken(token);
+		Map<String, Object> response = new HashMap<>();
+		response.put("valid", isValid);
+
+		if (isValid) {
+			String email = jwtUtil.getEmailFromToken(token);
+			response.put("email", email);
+		}
+
+		return ResponseEntity.ok(response);
+	}
+
 }
