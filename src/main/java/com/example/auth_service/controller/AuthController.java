@@ -67,9 +67,17 @@ public class AuthController {
 	}
 
 	@PostMapping("/validate")
-	public ResponseEntity<Object> validateToken(@RequestHeader("Authorization") String token) {
-		if (token != null && token.startsWith("Bearer ")) {
-			token = token.substring(7);
+	public ResponseEntity<Object> validateToken(@RequestHeader("Authorization") String authHeader) {
+		String token = null;
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+			token = authHeader.substring(7);
+		}
+
+		if (token == null) {
+			Map<String, Object> response = new HashMap<>();
+			response.put("valid", false);
+			response.put("error", "No token provided");
+			return ResponseEntity.badRequest().body(response);
 		}
 
 		boolean isValid = jwtUtil.validateToken(token);
